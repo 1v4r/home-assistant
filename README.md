@@ -18,3 +18,9 @@ resources:
 ```
 
 It still needs a bit of work with regards to using local formats and so forth.
+
+
+So far mostly a copy/paste/edit of stuff from 
+https://github.com/home-assistant/home-assistant-polymer/blob/dev/src/cards/ha-weather-card.js
+and
+https://github.com/rdehuyss/homeassistant-lovelace-alarm-clock-card/blob/master/alarm-clock-card.js
