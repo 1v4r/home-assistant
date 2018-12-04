@@ -5,6 +5,8 @@ Just been trying to figure out how to make new cards and get to know the framewo
 
 
 ## Clock Card
+![](https://i.imgur.com/L8CFpm6.gif "1")
+
 My first real try at a custom HA Lovelace card. 
 The clock card requires the following to be put into the ui-lovelace.yaml file
 ```
