@@ -17,6 +17,16 @@ resources:
     type: js
 ```
 
+For localisation, download the localise-file from here: https://github.com/moment/moment/tree/develop/locale
+and put your locale file in /local/locale/nl.js (example, replace ‘nl’ by the letters of your locale).
+And, modify ui-lovelace.yaml to show this:
+```
+resources:
+...
+  - url: /local/locale/nl.js
+    type: js
+```
+
 It still needs a bit of work with regards to using local formats and so forth.
 
 
