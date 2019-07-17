@@ -79,7 +79,11 @@ class ClockCard extends Polymer.Element {
     this._hass = hass;
   }
 
-  _updateTime(force = false) {
+  _updateTime(force = true) { 
+    if(typeof(moment) == "undefined") {
+      setTimeout(() => this._updateTime(), 200);
+      return;
+    }
     this.time.innerHTML = moment().format('HH:mm:ss');
     this.date.innerHTML = moment().format('ddd DD/MM/YYYY');
   }
