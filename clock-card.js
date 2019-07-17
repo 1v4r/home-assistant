@@ -84,6 +84,7 @@ class ClockCard extends Polymer.Element {
       setTimeout(() => this._updateTime(), 200);
       return;
     }
+    moment().locale(this._hass.language);
     this.time.innerHTML = moment().format('HH:mm:ss');
     this.date.innerHTML = moment().format('ddd DD/MM/YYYY');
   }
