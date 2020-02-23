@@ -28,9 +28,6 @@ resources:
 ```
 Finally, open HA on the page where the clock-card is shown, then clean the cache and hard-reload 2 times. After that the localized time and date are shown.
 
-It still needs a bit of work with regards to using local formats and so forth.
-
-
 So far mostly a copy/paste/edit of stuff from 
 https://github.com/home-assistant/home-assistant-polymer/blob/dev/src/cards/ha-weather-card.js
 and
