@@ -17,8 +17,16 @@ resources:
     type: js
 ```
 
-It still needs a bit of work with regards to using local formats and so forth.
-
+For localisation, download the localise-file from here: https://github.com/moment/moment/tree/develop/locale
+and put your locale file in /local/locale/nl.js (example, replace ‘nl’ by the letters of your locale).
+And, modify ui-lovelace.yaml to show this:
+```
+resources:
+...
+  - url: /local/locale/nl.js
+    type: js
+```
+Finally, open HA on the page where the clock-card is shown, then clean the cache and hard-reload 2 times. After that the localized time and date are shown.
 
 So far mostly a copy/paste/edit of stuff from 
 https://github.com/home-assistant/home-assistant-polymer/blob/dev/src/cards/ha-weather-card.js
