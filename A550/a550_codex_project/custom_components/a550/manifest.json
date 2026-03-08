@@ -1,0 +1,21 @@
+{
+  "domain": "a550",
+  "name": "A550",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/example/a550-home-assistant",
+  "issue_tracker": "https://github.com/example/a550-home-assistant/issues",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "dependencies": ["bluetooth"],
+  "after_dependencies": ["bluetooth"],
+  "codeowners": [],
+  "requirements": ["bleak>=0.22.3"],
+  "bluetooth": [
+    {
+      "local_name": "GS_*",
+      "service_uuid": "00006301-0000-0041-4c50-574953450000",
+      "connectable": true
+    }
+  ]
+}
