@@ -1,9 +1,3 @@
-# home-assistant
-My Home Assistant projects
-
-Just been trying to figure out how to make new cards and get to know the frameworks
-
-
 ## Clock Card
 ![](https://i.imgur.com/L8CFpm6.gif "1")
 
