@@ -3,13 +3,12 @@ from __future__ import annotations
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, PROBE_COUNT, SETTABLE_COOKING_STATUS
 from .coordinator import A550Coordinator
+from .entity import build_device_info
 
 OPTIONS = list(SETTABLE_COOKING_STATUS.keys())
 
@@ -33,14 +32,7 @@ class A550CookingStatusSelect(CoordinatorEntity[A550Coordinator], SelectEntity):
         self._probe_id = probe_id
         self._attr_unique_id = f"{coordinator.client.address}_probe_{probe_id}_cooking_status"
         self._attr_translation_placeholders = {"probe": str(probe_id)}
-        address = coordinator.client.address
-        self._attr_device_info = DeviceInfo(
-            connections={(CONNECTION_BLUETOOTH, address)},
-            identifiers={(DOMAIN, address)},
-            name=coordinator.client.name,
-            manufacturer="Clas Ohlson / Grill Smart",
-            model="A550",
-        )
+        self._attr_device_info = build_device_info(coordinator)
 
     @property
     def current_option(self) -> str | None:

@@ -3,13 +3,12 @@ from __future__ import annotations
 from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, PROBE_COUNT, TIMER_SLOT_COUNT
 from .coordinator import A550Coordinator
+from .entity import build_device_info
 
 
 async def async_setup_entry(
@@ -40,14 +39,7 @@ class A550TimerNumber(CoordinatorEntity[A550Coordinator], NumberEntity):
         self._slot = slot
         self._attr_unique_id = f"{coordinator.client.address}_probe_{probe_id}_timer_{slot}"
         self._attr_translation_placeholders = {"probe": str(probe_id), "slot": str(slot)}
-        address = coordinator.client.address
-        self._attr_device_info = DeviceInfo(
-            connections={(CONNECTION_BLUETOOTH, address)},
-            identifiers={(DOMAIN, address)},
-            name=coordinator.client.name,
-            manufacturer="Clas Ohlson / Grill Smart",
-            model="A550",
-        )
+        self._attr_device_info = build_device_info(coordinator)
 
     @property
     def native_value(self) -> float | None:

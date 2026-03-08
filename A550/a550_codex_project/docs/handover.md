@@ -15,6 +15,7 @@
 
 - Cooking status semantics are partially inferred from reverse-engineering.
 - Timer slot semantics are still not fully mapped.
+- Timer arrays are bit-packed and include an inferred timer-count nibble in timer reply packets.
 - There are no automated tests yet.
 - Manifest documentation and issue tracker URLs are placeholders.
 - Reconnect handling works, but could be made more robust if the device drops idle sessions.

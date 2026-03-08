@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Any
+from typing import Any, Callable
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory, PERCENTAGE, UnitOfTemperature
+from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTemperature
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ASSUME_FAHRENHEIT, DOMAIN, PROBE_COUNT
 from .coordinator import A550Coordinator
+from .entity import build_device_info
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -70,14 +74,7 @@ class A550BaseSensor(CoordinatorEntity[A550Coordinator], SensorEntity):
     def __init__(self, coordinator: A550Coordinator, description: A550SensorDescription) -> None:
         super().__init__(coordinator)
         self.entity_description = description
-        address = coordinator.client.address
-        self._attr_device_info = DeviceInfo(
-            connections={(CONNECTION_BLUETOOTH, address)},
-            identifiers={(DOMAIN, address)},
-            name=coordinator.client.name,
-            manufacturer="Clas Ohlson / Grill Smart",
-            model="A550",
-        )
+        self._attr_device_info = build_device_info(coordinator)
 
 
 class A550ProbeSensor(A550BaseSensor):
