@@ -91,6 +91,18 @@ Fields parsed from current implementation:
 
 On the tested unit, the raw current temperature behaves like Fahrenheit. Home Assistant should convert for display based on its own unit system.
 
+
+### Timer settings
+
+```text
+83 13 ...
+```
+
+Observed from packet parsing in this integration:
+- payload bytes encode 10 timer values using bit packing
+- byte 16 high nibble: probe id
+- byte 16 low nibble: timer count / active-slot count (inferred)
+
 ### Error packet
 
 ```text

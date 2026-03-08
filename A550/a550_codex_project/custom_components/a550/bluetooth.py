@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Callable
 
 from bleak import BleakClient
-
 from homeassistant.components import bluetooth
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import UpdateFailed
@@ -47,6 +46,7 @@ class A550Data:
     battery_percent: int | None
     probes: dict[int, ProbeReading]
     timers: dict[int, list[int]]
+    timer_counts: dict[int, int]
 
 
 class A550Client:
@@ -71,6 +71,7 @@ class A550Client:
                 for idx in range(PROBE_COUNT)
             },
             timers={idx: [0] * TIMER_SLOT_COUNT for idx in range(PROBE_COUNT)},
+            timer_counts={idx: 0 for idx in range(PROBE_COUNT)},
         )
 
     async def async_update(self) -> A550Data:
@@ -87,6 +88,10 @@ class A550Client:
             }
             timers: dict[int, list[int]] = {
                 idx: list(self._last_data.timers.get(idx, [0] * TIMER_SLOT_COUNT))
+                for idx in range(PROBE_COUNT)
+            }
+            timer_counts: dict[int, int] = {
+                idx: int(self._last_data.timer_counts.get(idx, 0))
                 for idx in range(PROBE_COUNT)
             }
 
@@ -114,7 +119,9 @@ class A550Client:
                         self._pkt_request_timer_settings(probe_id, self._device_nonce),
                         response=True,
                     )
-                    timers[probe_id] = await self._async_wait_for_timer_packet(self._queue, probe_id)
+                    timer_count, probe_timers = await self._async_wait_for_timer_packet(self._queue, probe_id)
+                    timer_counts[probe_id] = timer_count
+                    timers[probe_id] = probe_timers
             except Exception as err:  # noqa: BLE001
                 await self.async_disconnect()
                 raise UpdateFailed(f"Failed to poll A550 at {self.address}: {err}") from err
@@ -125,6 +132,7 @@ class A550Client:
                 battery_percent=battery_holder["value"],
                 probes=probes,
                 timers=timers,
+                timer_counts=timer_counts,
             )
             return self._last_data
 
@@ -164,9 +172,11 @@ class A550Client:
                 current = [0] * TIMER_SLOT_COUNT
             current[slot] = int(value)
 
+            timer_count = self._last_data.timer_counts.get(probe_id, TIMER_SLOT_COUNT)
+
             await client.write_gatt_char(
                 CTRL_CHAR_UUID,
-                self._pkt_set_timer(probe_id, TIMER_SLOT_COUNT, current, self._device_nonce),
+                self._pkt_set_timer(probe_id, timer_count, current, self._device_nonce),
                 response=True,
             )
             await self._async_wait_for_packet(
@@ -301,15 +311,19 @@ class A550Client:
                 if probe_id == requested_probe_id:
                     return
 
-    async def _async_wait_for_timer_packet(self, queue: asyncio.Queue[bytes], probe_id: int) -> list[int]:
+    async def _async_wait_for_timer_packet(
+        self,
+        queue: asyncio.Queue[bytes],
+        probe_id: int,
+    ) -> tuple[int, list[int]]:
         while True:
             packet = await self._async_wait_for_packet(
                 queue,
                 lambda pkt: len(pkt) >= 19 and pkt[0] == 0x83 and pkt[1] == 0x13,
             )
-            pkt_probe, timers = self._parse_timer_settings(packet)
+            pkt_probe, timer_count, timers = self._parse_timer_settings(packet)
             if pkt_probe == probe_id:
-                return timers
+                return timer_count, timers
 
     async def _async_wait_for_packet(self, queue: asyncio.Queue[bytes], matcher: Callable[[bytes], bool]) -> bytes:
         while True:
@@ -447,7 +461,7 @@ class A550Client:
         )
 
     @staticmethod
-    def _parse_timer_settings(packet: bytes) -> tuple[int, list[int]]:
+    def _parse_timer_settings(packet: bytes) -> tuple[int, int, list[int]]:
         timers = [0] * TIMER_SLOT_COUNT
         timers[0] = ((packet[3] & 0xE0) << 3) | packet[2]
         timers[1] = ((packet[4] & 0xFC) << 3) | (packet[3] & 0x1F)
@@ -460,7 +474,9 @@ class A550Client:
         timers[8] = ((packet[14] & 0xE0) << 3) | packet[13]
         timers[9] = ((packet[15] & 0xFC) << 3) | (packet[14] & 0x1F)
         probe_id = (packet[16] >> 4) & 0x0F
-        return probe_id, timers
+        # Android app protocol appears to store active timer count in the low nibble.
+        timer_count = packet[16] & 0x0F
+        return probe_id, timer_count, timers
 
     @staticmethod
     def cooking_status_name(code: int | None) -> str | None:
