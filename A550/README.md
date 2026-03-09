@@ -15,7 +15,7 @@ Art.no 44-1794
 
 ## Install
 
-Copy the `custom_components/a550` folder into your Home Assistant config directory:
+Copy the files into your Home Assistant config directory:
 
 ```text
 /config/custom_components/a550
@@ -32,25 +32,7 @@ Settings -> Devices & Services -> Add Integration -> A550
 ## Important note about units
 
 Many A550 units appear to report live probe temperatures in Fahrenheit.
-
-This integration defaults to converting from Fahrenheit to Celsius.
-If your thermometer is actually reporting Celsius already, edit:
-
-```python
-custom_components/a550/const.py
-```
-
-and change:
-
-```python
-ASSUME_FAHRENHEIT = True
-```
-
-to:
-
-```python
-ASSUME_FAHRENHEIT = False
-```
+Home Assistant will automatically convert and display temperatures according to your configured Unit System (Metric or US Customary).
 
 ## Known limitations
 
@@ -61,6 +43,3 @@ ASSUME_FAHRENHEIT = False
 
 
 Update 2026-03-08: This build keeps the BLE connection open between polls to avoid the thermometer reconnect beep on every refresh.
-
-
-Temperature entities now expose the thermometer's native unit to Home Assistant. If `ASSUME_FAHRENHEIT` is `True`, Home Assistant will automatically convert and display temperatures according to your configured Unit System (Metric or US Customary).
