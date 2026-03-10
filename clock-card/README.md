@@ -1,4 +1,5 @@
 ## Clock Card
+No longer maintained
 ![](https://i.imgur.com/L8CFpm6.gif "1")
 
 My first real try at a custom HA Lovelace card. 
